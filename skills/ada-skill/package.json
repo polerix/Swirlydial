@@ -1,0 +1,14 @@
+{
+  "name": "ada-skill",
+  "version": "1.0.0",
+  "description": "An OpenClaw skill to interact with the ADA sub-agent.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start:worker": "node dist/worker.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
