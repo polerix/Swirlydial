@@ -45,7 +45,7 @@ async function processJob(jobFile: string) {
     const report = await executeJob(job);
 
     const reportFilePath = join(reportsDir(job.repo), `${job.id}.json`);
-    await writeFile(reportFilePath, JSON.stringify({ ...report, job_id: job.id }, null, 2));
+    await writeFile(reportFilePath, JSON.stringify({ ...report, job_id: job.id, repo: job.repo }, null, 2));
     console.log(`Wrote report for job ${job.id} to ${reportFilePath}`);
 
     await rm(jobFilePath);
@@ -56,24 +56,20 @@ async function processJob(jobFile: string) {
 }
 
 async function startWorker() {
-  console.log('ADA worker started, watching for jobs in', jobsDir);
+  console.log('ADA worker started, processing pending jobs in', jobsDir);
 
-  // Process any existing jobs
+  // Process all existing jobs and then exit
   const existingJobs = await readdir(jobsDir);
   for (const jobFile of existingJobs) {
     if (jobFile.endsWith('.json')) {
       await processJob(jobFile);
     }
   }
-
-  // Watch for new jobs
-  const watcher = watch(jobsDir);
-  for await (const event of watcher) {
-    if (event.eventType === 'rename' && event.filename && event.filename.endsWith('.json')) {
-      // The file might not be fully written yet, wait a bit
-      setTimeout(() => processJob(event.filename!), 100);
-    }
-  }
+  console.log('ADA worker finished processing all pending jobs.');
 }
 
-startWorker().catch(console.error);
+// Ensure the worker starts when the script is executed
+if (require.main === module) {
+  startWorker().catch(console.error);
+}
+

@@ -10,6 +10,7 @@ export interface AdaJob {
 
 export interface AdaReport {
   job_id: string;
+  repo: string; // Add this line
   summary: string;
   patch_stats?: string;
   memory_update?: string;
